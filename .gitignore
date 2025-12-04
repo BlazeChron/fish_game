@@ -1,0 +1,5 @@
+.venv
+super_secret_pw
+discord_fish_game.egg-info/
+error.log
+build/

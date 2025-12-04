@@ -1,0 +1,3 @@
+#!/bin/bash
+pkill disc_fish_game
+echo "Successfully stopped"
