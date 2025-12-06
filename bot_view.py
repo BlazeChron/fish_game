@@ -9,6 +9,9 @@ import datetime
 
 import setproctitle
 
+import game
+import math
+
 setproctitle.setproctitle("disc_fish_game")
 
 bot = discord.Bot()
@@ -21,34 +24,104 @@ test_events = []
 
 @bot.slash_command()
 async def start(ctx: discord.ApplicationContext):
-  interaction = await ctx.send_response("test")
+  interaction = await ctx.send_response("Loading game")
+
   og_response = await interaction.original_response()
-  await og_response.add_reaction("🗿")
-  test_events.append(og_response)
+  await og_response.add_reaction("◀️")
+  await og_response.add_reaction("⏺")
+  await og_response.add_reaction("▶️")
+  new_game_state = game.start_game(og_response.id)
+  state_string = game_state_to_view(new_game_state)
+  edited_message = await og_response.edit(content=state_string)
+  test_events.append([edited_message, ctx.user.global_name])
 
   #await ctx.followup.send("test interaction")
 
 @bot.event
-async def on_raw_reaction_add(payload):
-  if payload.event_type != "REACTION_ADD":
-    return
-  reaction = payload.emoji
-  user = payload.member
-  print(reaction)
-  print(user)
+async def on_reaction_add(reaction, user):
+  username = user.global_name
+  print(reaction.emoji)
+  print(username)
   for i in test_events:
-    if i.id == payload.message_id:
-      curr_content = i.content
-      print(curr_content)
+    if i[0].id == reaction.message.id and username == i[1]:
+      curr_content = i[0].content
+
       edited_message = None
-      if curr_content.isnumeric():
-        new_content = str(int(curr_content) + 1)
-        edited_message = await i.edit(content=new_content)
-      else:
-        print("changing 0")
-        edited_message = await i.edit(content="0")
+      action = None
+      match(reaction.emoji):
+        case "◀️":
+          action = game.PlayerAction.REEL_IN
+        case "⏺":
+          action = game.PlayerAction.HOLD
+        case "▶️":
+          action = game.PlayerAction.SLACK
+      if action == None:
+        await reaction.remove(user)
+        return
+      current_state = game.take_fishing_action(i[0].id, action)
+      if current_state == None:
+        await reaction.remove(user)
+        return
+      new_content = game_state_to_view(current_state)
+
+      edited_message = await i[0].edit(content=new_content)
+
+      await reaction.remove(user)
       test_events.remove(i)
-      test_events.append(edited_message)
+      test_events.append([edited_message, i[1]])
+
+
+DEFAULT_LINE_LENGTH = 20
+def game_state_to_view(state):
+  state_string = "🎣"
+  # Fish line
+  line_length = math.floor(state["length"] / state["max_length"] * DEFAULT_LINE_LENGTH)
+  for i in range(0, line_length):
+    state_string += "-"  
+  state_string += "🐟"
+  if state["length"] == 0:
+    state_string += " You caught it!"
+
+  # Line length
+  line_length = math.floor(state["length"] / state["max_length"] * DEFAULT_LINE_LENGTH)
+  state_string += "\n`Line Length   |"
+  for i in range(0, DEFAULT_LINE_LENGTH - line_length):
+    state_string += "-"  
+  for i in range(0, line_length):
+    state_string += " "  
+  state_string += "|`"
+  if state["length"] == state["max_length"]:
+    state_string += " No more slack!"
+
+  # Tension bar
+  line_length = math.floor(state["tension"] / state["max_tension"] * DEFAULT_LINE_LENGTH)
+  state_string += "\n`Tension Gauge |"
+  for i in range(0, line_length):
+    state_string += "="  
+  for i in range(0, DEFAULT_LINE_LENGTH - line_length):
+    state_string += " "  
+  if state["tension"] > state["max_tension"]:
+    state_string += "` Line broke! It got away!"
+  else:
+    state_string += "|`"
+
+  if len(state["fish_action_history"]) > 1:
+    state_string += "\nFish last action: " + str(state["fish_action_history"][-2])
+  else:
+    state_string += "\nFish last action: None"
+    
+# Production
+  state_string += """
+◀️ Reel in ⏺ Hold ▶️ Slack
+""".format(**state)
+
+# Testing
+#  state_string += """
+#Fish next action: {fish_action}
+#Fish stamina: {stamina}/{max_stamina}
+#◀️ Reel in ⏺ Hold ▶️ Slack
+#""".format(**state)
+  return state_string
 
 
 ####################
