@@ -12,6 +12,7 @@ import setproctitle
 import game
 import math
 
+
 setproctitle.setproctitle("disc_fish_game")
 
 bot = discord.Bot()
