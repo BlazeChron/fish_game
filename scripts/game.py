@@ -2,6 +2,9 @@ from enum import Enum
 import math
 import random
 
+class TestPlayerAction(Enum):
+  INCREMENT = 0
+
 class PlayerAction(Enum):
   REEL_IN = 0
   HOLD = 1
@@ -66,27 +69,34 @@ def take_fishing_action(instance_id, player_action):
   return state
 
 def update_state(player_action, state):
-  fish_action = state["fish_action"]
-  for attribute in ["stamina", "length", "tension"]:
-    state[attribute] += action_matrix[fish_action][player_action][attribute]
-    # Values cannot go below 0
-    state[attribute] = max(0, state[attribute])
-
-  state["length"] = min(state["length"], state["max_length"])
-
-  # If fish is out of energy
-  if state["stamina"] == 0:
-    state["fish_action"] = FishAction.REST 
-  elif state["fish_action_history"][-1] == FishAction.REST:
-    # Rest based on max stamina
-    if random.random() < state["stamina"] / FISH_STAMINA:
-      state["fish_action"] = random.choice([FishAction.DASH, FishAction.RESIST])
-    else:
-      state["fish_action"] = FishAction.REST 
-  else:
-    state["fish_action"] = random.choice([FishAction.DASH, FishAction.RESIST])
-  state["fish_action_history"].append(state["fish_action"])
+  if player_action == None:
+    return
+  if player_action == TestPlayerAction.INCREMENT:
+    state["money"] += 1
   return state
+
+#def update_state(player_action, state):
+#  fish_action = state["fish_action"]
+#  for attribute in ["stamina", "length", "tension"]:
+#    state[attribute] += action_matrix[fish_action][player_action][attribute]
+#    # Values cannot go below 0
+#    state[attribute] = max(0, state[attribute])
+#
+#  state["length"] = min(state["length"], state["max_length"])
+#
+#  # If fish is out of energy
+#  if state["stamina"] == 0:
+#    state["fish_action"] = FishAction.REST 
+#  elif state["fish_action_history"][-1] == FishAction.REST:
+#    # Rest based on max stamina
+#    if random.random() < state["stamina"] / FISH_STAMINA:
+#      state["fish_action"] = random.choice([FishAction.DASH, FishAction.RESIST])
+#    else:
+#      state["fish_action"] = FishAction.REST 
+#  else:
+#    state["fish_action"] = random.choice([FishAction.DASH, FishAction.RESIST])
+#  state["fish_action_history"].append(state["fish_action"])
+#  return state
 
 action_matrix = {
 FishAction.DASH :   {PlayerAction.REEL_IN: {"stamina": -2, "length": -1, "tension":  2},

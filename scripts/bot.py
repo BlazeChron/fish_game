@@ -1,4 +1,4 @@
-# bot imports
+#bot imports
 import discord
 
 # error logging
@@ -31,11 +31,24 @@ async def start(ctx: discord.ApplicationContext):
   await session_manager.create_session(PLAYER_USERNAME, og_response)
 
 
-#@bot.event
-#async def on_reaction_add(reaction, user):
-#  username = user.global_name
-#  print(reaction.emoji)
-#  print(username)
+@bot.event
+async def on_reaction_add(reaction, user):
+  PLAYER_USERNAME = user.global_name
+  MESSAGE_ID = reaction.message.id
+  if PLAYER_USERNAME == None:
+    return
+
+  print(reaction.emoji + " from: " + PLAYER_USERNAME)
+
+  if not session_manager.is_valid_user_input(PLAYER_USERNAME, MESSAGE_ID):
+    await reaction.remove(user)
+    return
+
+  await session_manager.enter_player_input(PLAYER_USERNAME, reaction.emoji)
+  await reaction.remove(user)
+
+
+
 #  for i in test_events:
 #    if i[0].id == reaction.message.id and username == i[1]:
 #      curr_content = i[0].content
