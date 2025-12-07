@@ -3,7 +3,6 @@
 import discord
 
 import game_manager
-import game
 
 import game_state_string_adapter as gssa
 
@@ -12,16 +11,12 @@ import game_state_string_adapter as gssa
 ongoing_sessions = {}
 
 async def create_session(PLAYER_USERNAME, original_message: discord.Message):
-#  await og_response.add_reaction("◀️")
-#  await og_response.add_reaction("⏺")
-#  await og_response.add_reaction("▶️")
   SESSION_ID = original_message.id
 
-# On create session, remove any previous sessions
+  # On create session, remove any previous session
   if PLAYER_USERNAME in ongoing_sessions:
     previous_session = ongoing_sessions[PLAYER_USERNAME]
     await previous_session.message.delete()
-    # clear dictionary
     del ongoing_sessions[PLAYER_USERNAME]
   
   # sanity check
@@ -38,10 +33,11 @@ async def create_session(PLAYER_USERNAME, original_message: discord.Message):
 def is_valid_user_input(PLAYER_USERNAME, MESSAGE_ID):
   return PLAYER_USERNAME in ongoing_sessions and ongoing_sessions[PLAYER_USERNAME].message.id == MESSAGE_ID
 
+# Should be managed by the Session instead
 async def enter_player_input(PLAYER_USERNAME, raw_player_input):
-  game_state = ongoing_sessions[PLAYER_USERNAME].game_state
+  player_session = ongoing_sessions[PLAYER_USERNAME]
+  game_state = await player_session.enter_player_input(raw_player_input)
 
-  game_state = game_manager.update_state(raw_player_input, game_state)
   if game_state == None:
     return None
 
@@ -55,5 +51,9 @@ async def enter_player_input(PLAYER_USERNAME, raw_player_input):
 class Session:
   def __init__(self, msg, gs):
     self.message = msg
-    self.expiry_date = None
     self.game_state = gs
+
+  async def enter_player_input(self, raw_player_input):
+    new_game_state = game_manager.update_state(raw_player_input, self.game_state)
+    return new_game_state
+

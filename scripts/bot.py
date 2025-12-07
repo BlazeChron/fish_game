@@ -20,14 +20,12 @@ bot = discord.Bot()
 async def on_ready():
   print(f'Logged on as {bot.user}')
 
-#test_events = []
-
 @bot.slash_command()
 async def start(ctx: discord.ApplicationContext):
   interaction = await ctx.send_response("Loading game")
   PLAYER_USERNAME = ctx.user.global_name
-
   og_response = await interaction.original_response()
+
   await session_manager.create_session(PLAYER_USERNAME, og_response)
 
 
