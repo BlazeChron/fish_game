@@ -2,6 +2,7 @@
 echo "Starting environment"
 source ./.venv/bin/activate
 echo "Starting bot script as background process"
+#nohup python3 bot_view.py & 
 python3 bot_view.py & 
 echo "Deactivating environment"
 deactivate
