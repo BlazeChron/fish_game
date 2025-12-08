@@ -11,6 +11,9 @@ import setproctitle
 
 import session_manager
 
+# Temporary test db
+import fish_db
+fish_db.test_table()
 
 setproctitle.setproctitle("disc_fish_game")
 

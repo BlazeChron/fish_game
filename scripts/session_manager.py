@@ -42,7 +42,10 @@ async def enter_player_input(PLAYER_USERNAME, raw_player_input):
   if game_state == None:
     return None
 
+  game_manager.save_game(PLAYER_USERNAME, game_state)
+
   new_content = gssa.state_to_string(game_state)
+
 
   edited_message = await player_session.edit_message(new_content)
 
