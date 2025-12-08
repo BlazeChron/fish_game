@@ -31,6 +31,10 @@ async def start(ctx: discord.ApplicationContext):
 
 @bot.event
 async def on_reaction_add(reaction, user):
+  # Only listen to reactions on own messages
+  if reaction.message.author != bot.user:
+    return
+
   PLAYER_USERNAME = user.global_name
   MESSAGE_ID = reaction.message.id
   if PLAYER_USERNAME == None:
