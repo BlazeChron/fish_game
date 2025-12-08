@@ -30,6 +30,7 @@ async def create_session(PLAYER_USERNAME, original_message: discord.Message):
 
   ongoing_sessions[PLAYER_USERNAME] = Session(edited_message, game_state)
 
+# If the user input is on their own session's message
 def is_valid_user_input(PLAYER_USERNAME, MESSAGE_ID):
   return PLAYER_USERNAME in ongoing_sessions and ongoing_sessions[PLAYER_USERNAME].message.id == MESSAGE_ID
 
@@ -43,7 +44,7 @@ async def enter_player_input(PLAYER_USERNAME, raw_player_input):
 
   new_content = gssa.state_to_string(game_state)
 
-  edited_message = await ongoing_sessions[PLAYER_USERNAME].message.edit(content=new_content)
+  edited_message = await player_session.edit_message(new_content)
 
   del ongoing_sessions[PLAYER_USERNAME]
   ongoing_sessions[PLAYER_USERNAME] = Session(edited_message, game_state)
@@ -57,3 +58,5 @@ class Session:
     new_game_state = game_manager.update_state(raw_player_input, self.game_state)
     return new_game_state
 
+  async def edit_message(self, new_content):
+    return await self.message.edit(content=new_content)
