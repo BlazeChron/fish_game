@@ -45,11 +45,12 @@ async def on_reaction_add(reaction, user):
 
   print(reaction.emoji + " from: " + PLAYER_USERNAME)
 
-  if not session_manager.is_valid_user_input(PLAYER_USERNAME, MESSAGE_ID):
+  player_session = session_manager.get_session(PLAYER_USERNAME)
+  if player_session == None or not player_session.get_message_id() == MESSAGE_ID:
     await reaction.remove(user)
     return
-
-  await session_manager.enter_player_input(PLAYER_USERNAME, reaction.emoji)
+  
+  await player_session.enter_player_input(reaction.emoji)
   await reaction.remove(user)
 
 

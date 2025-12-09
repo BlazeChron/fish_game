@@ -28,38 +28,36 @@ async def create_session(PLAYER_USERNAME, original_message: discord.Message):
   edited_message = await original_message.edit(content=new_content)
   await edited_message.add_reaction("⏺")
 
-  ongoing_sessions[PLAYER_USERNAME] = Session(edited_message, game_state)
+  ongoing_sessions[PLAYER_USERNAME] = Session(PLAYER_USERNAME, edited_message, game_state)
 
-# If the user input is on their own session's message
-def is_valid_user_input(PLAYER_USERNAME, MESSAGE_ID):
-  return PLAYER_USERNAME in ongoing_sessions and ongoing_sessions[PLAYER_USERNAME].message.id == MESSAGE_ID
-
-# Should be managed by the Session instead
-async def enter_player_input(PLAYER_USERNAME, raw_player_input):
-  player_session = ongoing_sessions[PLAYER_USERNAME]
-  game_state = await player_session.enter_player_input(raw_player_input)
-
-  if game_state == None:
+# Gets session of player interacting with message
+def get_session(PLAYER_USERNAME):
+  if not PLAYER_USERNAME in ongoing_sessions:
     return None
+  return ongoing_sessions[PLAYER_USERNAME]
 
-  game_manager.save_game(PLAYER_USERNAME, game_state)
-
-  new_content = gssa.state_to_string(game_state)
-
-
-  edited_message = await player_session.edit_message(new_content)
-
-  del ongoing_sessions[PLAYER_USERNAME]
-  ongoing_sessions[PLAYER_USERNAME] = Session(edited_message, game_state)
-
+# Session class that users interact with
+# Handles output
 class Session:
-  def __init__(self, msg, gs):
+  def __init__(self, username, msg, gs):
+    self.PLAYER_USERNAME = username
     self.message = msg
     self.game_state = gs
 
   async def enter_player_input(self, raw_player_input):
     new_game_state = game_manager.update_state(raw_player_input, self.game_state)
-    return new_game_state
+    if new_game_state == None:
+      return
+
+    self.game_state = new_game_state
+    game_manager.save_game(self.PLAYER_USERNAME, self.game_state)
+    new_content = gssa.state_to_string(self.game_state)
+    edited_message = await self.edit_message(new_content)
 
   async def edit_message(self, new_content):
-    return await self.message.edit(content=new_content)
+    edited_message = await self.message.edit(content=new_content)
+    self.message = edited_message
+    return edited_message
+
+  def get_message_id(self):
+    return self.message.id
