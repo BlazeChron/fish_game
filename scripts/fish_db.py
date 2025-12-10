@@ -30,7 +30,6 @@ def create_save_file(PLAYER_USERNAME):
     INSERT INTO users (username, money)
     VALUES (%s, %s);
   """, (PLAYER_USERNAME, 0))
-    #conn.commit()
 
 def update_money(updated_amount, PLAYER_USERNAME):
   with psycopg.connect(os.getenv("DB_STRING")) as conn:
@@ -39,8 +38,6 @@ def update_money(updated_amount, PLAYER_USERNAME):
       SET money = (%s)
       WHERE username = (%s);
     """, (updated_amount, PLAYER_USERNAME))
-    #conn.commit()
-
 
 def test_table():
   load_dotenv()
@@ -56,15 +53,3 @@ def test_table():
           )
       """)
       conn.commit()
-#  
-#      cur.execute("SELECT * FROM test")
-#      print(cur.fetchone())
-#  
-#      cur.executemany("INSERT INTO test (num) values (%s)",
-#        [(33,), (66,), (99,)])
-#      
-#      cur.execute("SELECT id, num FROM test order by num")
-#      for record in cur:
-#        print(record)
-#  
-#      conn.commit()
