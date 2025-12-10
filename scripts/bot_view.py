@@ -1,3 +1,5 @@
+# Deprecated
+
 # bot imports
 import discord
 
