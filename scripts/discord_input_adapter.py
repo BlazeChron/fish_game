@@ -2,9 +2,6 @@ from enum import Enum
 from scene.main_menu_scene import MainMenuScene, MainMenuAction 
 from scene.dialogue_scene import DialogueScene, DialogueAction 
 
-def is_valid_input(player_input):
-  return player_input == button
-
 def convert_discord_to_game(player_input, scene):
   if isinstance(scene, MainMenuScene):
     match player_input:
