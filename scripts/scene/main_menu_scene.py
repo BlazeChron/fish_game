@@ -18,6 +18,6 @@ class MainMenuScene(Scene):
     return self
 
   # TODO Add a list of required inputs as an Enum
-  def get_required_inputs() -> List[Enum]:
-    return []
+  def get_required_inputs(self) -> List[Enum]:
+    return [TestPlayerAction.INCREMENT]
 

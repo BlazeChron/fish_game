@@ -23,6 +23,6 @@ class Scene:
     return self
 
   # TODO Add a list of required inputs as an Enum
-  def get_required_inputs() -> List[Enum]:
+  def get_required_inputs(self) -> List[Enum]:
     return []
 
