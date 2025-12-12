@@ -2,9 +2,7 @@
 
 import fish_db
 import game
-import scene
-
-import discord_input_adapter as dia
+from scene.main_menu_scene import MainMenuScene
 
 # Loads the game from database based on username
 # If it does not exist, creates an entry instead
@@ -17,17 +15,8 @@ async def load_game(PLAYER_USERNAME):
 
   # User exists
   save_state = fish_db.get_save_file(PLAYER_USERNAME)
-  menu_scene = scene.MainMenuScene(save_state)
+  menu_scene = MainMenuScene(save_state)
   return menu_scene
 
 def save_game(PLAYER_USERNAME, game_state):
   fish_db.update_money(game_state["money"], PLAYER_USERNAME)
-
-def update_state(raw_player_input, game_state):
-  converted_player_input = dia.convert_input(raw_player_input)
-  if converted_player_input == None:
-    return None
-
-  game_state = game.update_state(converted_player_input, game_state)
-
-  return game_state

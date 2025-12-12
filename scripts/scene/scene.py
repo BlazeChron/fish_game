@@ -19,13 +19,10 @@ class Scene:
     return self.game_state
 
   # TODO On Player input, return the next scene
-  async def enter_player_input(self, raw_player_input) -> Self:
+  async def enter_player_input(self, player_input) -> Self:
     return self
 
   # TODO Add a list of required inputs as an Enum
   def get_required_inputs() -> List[Enum]:
     return []
 
-class MainMenuScene(Scene):
-  def test_scene(self):
-    print("Scene is working!")
