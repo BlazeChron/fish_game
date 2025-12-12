@@ -10,6 +10,7 @@ class Session:
     self.PLAYER_USERNAME = username
     self.message = msg
     self.game_scene = game_scene
+    self.reactions = []
 
   # Factory method to work around async initialisation
   @classmethod
@@ -25,7 +26,7 @@ class Session:
     return self
 
   async def enter_player_input(self, raw_player_input):
-    converted_player_input = dia.convert_discord_to_game(raw_player_input)
+    converted_player_input = dia.convert_discord_to_game(raw_player_input, self.game_scene)
     if converted_player_input == None:
       return 
 
@@ -36,7 +37,7 @@ class Session:
       self.game_scene = new_scene
 
     new_game_state = self.game_scene.get_game_state()
-    game_manager.save_game(self.PLAYER_USERNAME, new_game_state)
+    #game_manager.save_game(self.PLAYER_USERNAME, new_game_state)
     await doa.scene_to_output(self.game_scene, self)
     #edited_message = await self.edit_message(new_content)
 
@@ -45,10 +46,15 @@ class Session:
     self.message = edited_message
 
   def get_reactions(self):
-    return self.message.reactions
+    return self.reactions
 
   async def add_reaction(self, emoji):
     await self.message.add_reaction(emoji)
+    self.reactions.append(emoji)
+
+  async def remove_reaction(self, emoji):
+    await self.message.clear_reaction(emoji)
+    self.reactions.pop(self.reactions.index(emoji))
 
   def get_message_id(self):
     return self.message.id
