@@ -1,35 +1,30 @@
 from enum import Enum
+from bidict import bidict
+
 from scene.main_menu_scene import MainMenuScene, MainMenuAction 
+MAIN_MENU_INPUT_MAP = bidict({
+  "⏺": MainMenuAction.GO_TO_DIALOGUE,
+  "🎣": MainMenuAction.GO_TO_FISH
+})
+
 from scene.dialogue_scene import DialogueScene, DialogueAction 
+DIALOGUE_INPUT_MAP = bidict({
+  "⏺": DialogueAction.NEXT,
+  "👍": DialogueAction.RETURN
+})
 
 def convert_discord_to_game(player_input, scene):
   if isinstance(scene, MainMenuScene):
-    match player_input:
-      case "⏺":
-        return MainMenuAction.GO_TO_DIALOGUE
-      case "🎣":
-        return MainMenuAction.GO_TO_FISH
+    return MAIN_MENU_INPUT_MAP[player_input]
   if isinstance(scene, DialogueScene):
-    match player_input:
-      case "⏺":
-        return DialogueAction.NEXT
-      case "👍":
-        return DialogueAction.RETURN
-  print("No such input")
+    return DIALOGUE_INPUT_MAP[player_input]
+  print("No such player input")
   return None
 
 def convert_game_to_discord(game_input, scene):
   if isinstance(scene, MainMenuScene):
-    match game_input:
-      case MainMenuAction.GO_TO_DIALOGUE:
-        return "⏺"
-      case MainMenuAction.GO_TO_FISH:
-        return "🎣"
-
+    return MAIN_MENU_INPUT_MAP.inverse[game_input]
   if isinstance(scene, DialogueScene):
-    match game_input:
-      case DialogueAction.NEXT:
-        return "⏺"
-      case DialogueAction.RETURN:
-        return "👍"
+    return DIALOGUE_INPUT_MAP.inverse[game_input]
+  print("No such game input")
   return None
