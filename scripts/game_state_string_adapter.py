@@ -1,6 +1,7 @@
 
 from scene.main_menu_scene import MainMenuScene, MainMenuAction 
 from scene.dialogue_scene import DialogueScene, DialogueAction 
+from scene.fish_game_scene import FishGameScene, FishGameAction
 
 #def state_to_string(state):
 #  return "money: {money}".format(**state)
@@ -22,4 +23,12 @@ Dialogue, Go fish
 \"
 """.format(**state) + """
 Next:
+"""
+
+  if isinstance(scene, FishGameScene):
+    state = scene.get_game_state()
+    return """
+You have caught: {caught}
+""".format(**state) + """
+Fish, Back
 """

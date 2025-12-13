@@ -13,11 +13,19 @@ DIALOGUE_INPUT_MAP = bidict({
   "👍": DialogueAction.NEXT_SCENE
 })
 
+from scene.fish_game_scene import FishGameScene, FishGameAction
+FISH_GAME_INPUT_MAP = bidict({
+  "🎣": FishGameAction.FISH,
+  "🔙":  FishGameAction.BACK
+})
+
 def convert_discord_to_game(player_input, scene):
   if isinstance(scene, MainMenuScene):
     return MAIN_MENU_INPUT_MAP[player_input]
   if isinstance(scene, DialogueScene):
     return DIALOGUE_INPUT_MAP[player_input]
+  if isinstance(scene, FishGameScene):
+    return FISH_GAME_INPUT_MAP[player_input]
   print("No such player input")
   return None
 
@@ -26,5 +34,7 @@ def convert_game_to_discord(game_input, scene):
     return MAIN_MENU_INPUT_MAP.inverse[game_input]
   if isinstance(scene, DialogueScene):
     return DIALOGUE_INPUT_MAP.inverse[game_input]
+  if isinstance(scene, FishGameScene):
+    return FISH_GAME_INPUT_MAP.inverse[game_input]
   print("No such game input")
   return None

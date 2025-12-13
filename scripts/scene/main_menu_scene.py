@@ -1,5 +1,6 @@
 from scene.scene import Scene
 from scene.dialogue_scene import DialogueScene
+from scene.fish_game_scene import FishGameScene
 from enum import Enum
 from typing import Self, List
 
@@ -12,8 +13,10 @@ class MainMenuScene(Scene):
     if player_action == None:
       return self
     if player_action == MainMenuAction.GO_TO_DIALOGUE:
-      self.game_state["money"] += 1
+      #self.game_state["money"] += 1
       return DialogueScene(self)
+    if player_action == MainMenuAction.GO_TO_FISH:
+      return FishGameScene(self)
     return self
 
   def get_required_inputs(self) -> List[Enum]:
