@@ -4,11 +4,13 @@ from typing import Self, List
 
 class DialogueAction(Enum):
   NEXT = 0
-  RETURN = 1
+  NEXT_SCENE = 1
 
 class DialogueScene(Scene):
-  def __init__(self, game_state):
+  def __init__(self, following_scene):
     self.load_dialogue()
+    # Scene to load after the dialogue 
+    self.following_scene = following_scene
     game_state = {"text": self.dialogue[self.dialogue_index]}
     super(DialogueScene, self).__init__(game_state)
 
@@ -23,11 +25,13 @@ class DialogueScene(Scene):
       # TODO Actual race condition if you spam
       self.dialogue_index += 1
       self.get_game_state()["text"] = self.dialogue[self.dialogue_index]
+    if player_action == DialogueAction.NEXT_SCENE:
+      return self.following_scene
     return self
 
   def get_required_inputs(self) -> List[Enum]:
     if self.dialogue_index >= len(self.dialogue) - 1:
-      return [DialogueAction.RETURN]
+      return [DialogueAction.NEXT_SCENE]
     return [DialogueAction.NEXT]
 
   def load_dialogue(self):

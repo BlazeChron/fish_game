@@ -10,7 +10,7 @@ MAIN_MENU_INPUT_MAP = bidict({
 from scene.dialogue_scene import DialogueScene, DialogueAction 
 DIALOGUE_INPUT_MAP = bidict({
   "⏺": DialogueAction.NEXT,
-  "👍": DialogueAction.RETURN
+  "👍": DialogueAction.NEXT_SCENE
 })
 
 def convert_discord_to_game(player_input, scene):

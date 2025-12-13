@@ -13,7 +13,7 @@ class MainMenuScene(Scene):
       return self
     if player_action == MainMenuAction.GO_TO_DIALOGUE:
       self.game_state["money"] += 1
-      return DialogueScene(None)
+      return DialogueScene(self)
     return self
 
   def get_required_inputs(self) -> List[Enum]:
