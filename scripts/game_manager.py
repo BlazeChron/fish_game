@@ -3,6 +3,7 @@
 import fish_db
 import game
 from scene.main_menu_scene import MainMenuScene
+from scene.start_dialogue_scene import StartDialogueScene
 
 # Loads the game from database based on username
 # If it does not exist, creates an entry instead
@@ -12,6 +13,9 @@ async def load_game(PLAYER_USERNAME):
     print("User does not exist")
     fish_db.create_save_file(PLAYER_USERNAME)
     print("Created new user")
+    save_state = fish_db.get_save_file(PLAYER_USERNAME)
+    start_scene = StartDialogueScene(MainMenuScene(save_state))
+    return start_scene
 
   # User exists
   save_state = fish_db.get_save_file(PLAYER_USERNAME)
