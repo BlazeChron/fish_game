@@ -53,3 +53,16 @@ def test_table():
           )
       """)
       conn.commit()
+
+def create_fishes():
+  load_dotenv()
+  with psycopg.connect(os.getenv("DB_STRING")) as conn:
+    with conn.cursor() as cur:
+      cur.execute("DROP table IF EXISTS fish_types")
+      cur.execute("""
+        CREATE TABLE fish_types (
+          id serial PRIMARY KEY,
+          fish_name text UNIQUE,
+          )
+      """)
+      conn.commit()
