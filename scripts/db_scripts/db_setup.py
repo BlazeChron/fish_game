@@ -73,6 +73,7 @@ def create_fish():
     if roll_type <= curr_total:
       chosen_record = record
       break
+  fish_type = chosen_record[1]
 
   # Rolling number between 0 to 1 to determine fish size based on norm distribution
   roll_size = random.random()
@@ -84,7 +85,9 @@ def create_fish():
       size_value = entry[1]
       break
   size = scipy.stats.norm.ppf(roll_size, loc=chosen_record[3], scale=chosen_record[4])
-  print("Size: {:.2f}cm".format(size / 100) + " " + size_value + " " + roll_string)
+  print_string = fish_type + " Size: {:.2f}cm".format(size / 100) + " " + size_value + " " + roll_string
+  print(print_string)
+  return print_string
 
 # Testing purposes
 def a():

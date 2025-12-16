@@ -2,6 +2,8 @@ from scene.scene import Scene
 from enum import Enum
 from typing import Self, List
 
+import db_scripts.db_setup as db
+
 class FishGameAction(Enum):
   FISH = 0
   BACK = 1
@@ -17,7 +19,8 @@ class FishGameScene(Scene):
     if player_action == None:
       return self
     if player_action == FishGameAction.FISH:
-      self.get_game_state()["caught"].append("bingbong fish")
+      fish = db.create_fish()
+      self.get_game_state()["caught"].append(fish)
     if player_action == FishGameAction.BACK:
       return self.following_scene
     return self
