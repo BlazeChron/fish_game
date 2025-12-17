@@ -4,8 +4,10 @@ import psycopg
 # Environment variables
 import os
 from dotenv import load_dotenv
+import db_scripts.db_setup
 
 def save_file_exists(PLAYER_USERNAME):
+  load_dotenv()
   username_exists_cursor = psycopg.connect(os.getenv("DB_STRING")).execute("""
     SELECT 1
     FROM users
@@ -15,6 +17,7 @@ def save_file_exists(PLAYER_USERNAME):
   return username_exists_cursor.fetchone() != None
 
 def get_save_file(PLAYER_USERNAME):
+  load_dotenv()
   money_cursor = psycopg.connect(os.getenv("DB_STRING")).execute("""
     SELECT money
     FROM users
@@ -25,6 +28,7 @@ def get_save_file(PLAYER_USERNAME):
   return {"money": money}
 
 def create_save_file(PLAYER_USERNAME):
+  load_dotenv()
   with psycopg.connect(os.getenv("DB_STRING")) as conn:
     conn.execute("""
     INSERT INTO users (username, money)
@@ -32,6 +36,7 @@ def create_save_file(PLAYER_USERNAME):
   """, (PLAYER_USERNAME, 0))
 
 def update_money(updated_amount, PLAYER_USERNAME):
+  load_dotenv()
   with psycopg.connect(os.getenv("DB_STRING")) as conn:
     conn.execute("""
       UPDATE users
@@ -39,10 +44,11 @@ def update_money(updated_amount, PLAYER_USERNAME):
       WHERE username = (%s);
     """, (updated_amount, PLAYER_USERNAME))
 
-def test_table():
+def reset_db():
   load_dotenv()
   with psycopg.connect(os.getenv("DB_STRING")) as conn:
     with conn.cursor() as cur:
+      cur.execute("DROP table IF EXISTS user_fish")
       cur.execute("DROP table IF EXISTS test")
       cur.execute("DROP table IF EXISTS users")
       cur.execute("""
@@ -53,6 +59,8 @@ def test_table():
           )
       """)
       conn.commit()
+  db_scripts.db_setup.create_user_fish()
+
 
 def create_fishes():
   load_dotenv()

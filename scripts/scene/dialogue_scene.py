@@ -7,12 +7,12 @@ class DialogueAction(Enum):
   NEXT_SCENE = 1
 
 class DialogueScene(Scene):
-  def __init__(self, following_scene):
+  def __init__(self, following_scene, username):
     self.load_dialogue()
     # Scene to load after the dialogue 
     self.following_scene = following_scene
     game_state = {"text": self.dialogue[self.dialogue_index]}
-    super(DialogueScene, self).__init__(game_state)
+    super(DialogueScene, self).__init__(game_state, username)
 
   async def enter_player_input(self, player_action) -> Self:
     if player_action == None:

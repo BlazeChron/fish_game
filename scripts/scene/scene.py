@@ -12,8 +12,9 @@ from typing import Self, List
 #  DO_NOTHING = 0
 
 class Scene:
-  def __init__(self, game_state):
+  def __init__(self, game_state, username):
     self.game_state = game_state
+    self.username = username 
 
   def get_game_state(self):
     return self.game_state

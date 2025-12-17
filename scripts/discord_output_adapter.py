@@ -28,12 +28,16 @@ async def add_reactions(scene, session):
 
   # Iterates over each reaction in the message If it exists, flags it as 1.
   # Otherwise, it removes the reaction
-  current_reactions = session.get_reactions()
+  current_reactions = session.get_reactions().copy()
+  print(current_reactions)
   for emoji in current_reactions:
+    print(emoji)
     if not emoji in converted_inputs:
+      print("removing")
       await session.remove_reaction(emoji)
     else:
       converted_inputs[emoji] = 1
+  print(converted_inputs)
 
   # Afterwards, the remaining required reactions if flag is 0,
   # add the new reaction

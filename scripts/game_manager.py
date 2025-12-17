@@ -14,12 +14,12 @@ async def load_game(PLAYER_USERNAME):
     fish_db.create_save_file(PLAYER_USERNAME)
     print("Created new user")
     save_state = fish_db.get_save_file(PLAYER_USERNAME)
-    start_scene = StartDialogueScene(MainMenuScene(save_state))
+    start_scene = StartDialogueScene(MainMenuScene(save_state, PLAYER_USERNAME), PLAYER_USERNAME)
     return start_scene
 
   # User exists
   save_state = fish_db.get_save_file(PLAYER_USERNAME)
-  menu_scene = MainMenuScene(save_state)
+  menu_scene = MainMenuScene(save_state, PLAYER_USERNAME)
   return menu_scene
 
 def save_game(PLAYER_USERNAME, game_state):

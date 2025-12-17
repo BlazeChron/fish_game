@@ -57,9 +57,9 @@ def add_fish_types():
       """, [(x[0], x[1], x[2], x[3], x[4]) for x in fish_types])
       conn.commit()
 
-def create_fish():
+def create_fish(username):
   load_dotenv()
-  cur = psycopg.connect(os.getenv("DB_STRING")).execute("SELECT * FROM fish_types").fetchall()
+  cur = psycopg.connect(os.getenv("DB_STRING")).execute("select * from fish_types").fetchall()
 
   total = 0
   for record in cur:
@@ -87,13 +87,75 @@ def create_fish():
   size = scipy.stats.norm.ppf(roll_size, loc=chosen_record[3], scale=chosen_record[4])
   print_string = fish_type + " Size: {:.2f}cm".format(size / 100) + " " + size_value + " " + roll_string
   print(print_string)
+
+  if not username == None:
+    save_user_fish(username, fish_type, chosen_record[2], roll_size)
+
   return print_string
 
-# Testing purposes
-def a():
-  create_fish_types()
-  add_fish_types()
+class Fish:
+  def __init__(self, fish_type, color, size):
+    self.fish_type = fish_type
+    self.color = color
+    self.size = size
 
-def b():
-  for i in range(30):
-    create_fish()
+  def to_string(self):
+    load_dotenv()
+    fish_stats = psycopg.connect(os.getenv("DB_STRING")).execute("select * from fish_types where type = (%s)", (self.fish_type,)).fetchone()
+    print(fish_stats)
+    fish_size = scipy.stats.norm.ppf(self.size, loc=fish_stats[3], scale=fish_stats[4])
+    string_sizes = [[0.05, "Mini Crown"], [0.10, "XS"], [0.30,"S"], [0.70, "M"], [0.90, "L"], [0.95, "XL"], [1, "Large Crown"]]
+    # Determine size ranking
+    size_value = ""
+    for entry in string_sizes:
+      if self.size <= entry[0]:
+        size_value = entry[1]
+        break
+    print_string = self.fish_type + " Size: {:.2f}cm".format(fish_size / 100) + " " + size_value
+    return print_string
+
+def create_user_fish():
+  load_dotenv()
+  with psycopg.connect(os.getenv("DB_STRING")) as conn:
+    with conn.cursor() as cur:
+      cur.execute("DROP table IF EXISTS user_fish")
+      cur.execute("""
+        CREATE TABLE user_fish (
+          id serial PRIMARY KEY,
+          user_id serial REFERENCES users (id),
+          type text REFERENCES fish_types (type),
+          color text,
+          size numeric
+          )
+      """)
+      conn.commit()
+
+def save_user_fish(username, fish_type, fish_color, fish_size):
+  load_dotenv()
+  with psycopg.connect(os.getenv("DB_STRING")) as conn:
+    with conn.cursor() as cur:
+      cur.execute("SELECT id FROM users WHERE username = (%s)", (username,))
+      uid = cur.fetchone()[0]
+      print("uid: " + str(uid))
+      cur.execute("INSERT INTO user_fish (user_id, type, color, size) VALUES (%s, %s, %s, %s)", (uid, fish_type, fish_color, fish_size))
+      conn.commit()
+
+def get_user_fishes_as_string(username):
+  load_dotenv()
+  money_cursor = psycopg.connect(os.getenv("DB_STRING")).execute("""
+    SELECT user_fish.type, user_fish.color, user_fish.size
+    FROM users LEFT JOIN user_fish ON users.id = user_fish.user_id
+    WHERE users.username = (%s);
+  """, (username,))
+  user_fishes = money_cursor.fetchall()
+  if user_fishes[0][0] == None:
+    return "You have nothing"
+  return_string = ""
+  for entry in user_fishes:
+    fish = Fish(entry[0], entry[1], float(entry[2]))
+    return_string += fish.to_string() + "\n"
+    #print(fish.to_string())
+  return return_string
+
+
+  
