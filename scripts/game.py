@@ -2,9 +2,6 @@ from enum import Enum
 import math
 import random
 
-class TestPlayerAction(Enum):
-  INCREMENT = 0
-
 class PlayerAction(Enum):
   REEL_IN = 0
   HOLD = 1
@@ -68,12 +65,6 @@ def take_fishing_action(instance_id, player_action):
   games[instance_id] = state
   return state
 
-def update_state(player_action, state):
-  if player_action == None:
-    return
-  if player_action == TestPlayerAction.INCREMENT:
-    state["money"] += 1
-  return state
 
 #def update_state(player_action, state):
 #  fish_action = state["fish_action"]
